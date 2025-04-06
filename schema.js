@@ -1,12 +1,15 @@
-// schema.js
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
   type User {
     id: ID!
+    username: String!
     email: String!
-    password: String
-    token: String
+  }
+
+  type AuthPayload {
+    token: String!
+    user: User!
   }
 
   type Employee {
@@ -19,40 +22,26 @@ const typeDefs = gql`
     imageUrl: String
   }
 
-  type AuthPayload {
-    token: String!
-    user: User!
+  input EmployeeInput {
+    name: String!
+    email: String!
+    department: String!
+    position: String!
+    salary: Float!
+    imageUrl: String
   }
 
   type Query {
-    getEmployees: [Employee]
+    getEmployees: [Employee!]!
     getEmployee(id: ID!): Employee
   }
 
   type Mutation {
-    signup(email: String!, password: String!): AuthPayload
-    login(email: String!, password: String!): AuthPayload
-
-    addEmployee(
-      name: String!
-      email: String!
-      department: String!
-      position: String!
-      salary: Float!
-      imageUrl: String
-    ): Employee
-
-    updateEmployee(
-      id: ID!
-      name: String
-      email: String
-      department: String
-      position: String
-      salary: Float
-      imageUrl: String
-    ): Employee
-
-    deleteEmployee(id: ID!): String
+    signup(username: String!, email: String!, password: String!): AuthPayload!
+    login(username: String!, password: String!): AuthPayload!
+    addEmployee(input: EmployeeInput!): Employee!
+    updateEmployee(id: ID!, input: EmployeeInput!): Employee!
+    deleteEmployee(id: ID!): String!
   }
 `;
 

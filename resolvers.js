@@ -1,10 +1,9 @@
-// resolvers.js
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 const Employee = require('./models/Employee');
 
-const SECRET = 'supersecretkey'; 
+const SECRET = 'supersecretkey';
 
 const resolvers = {
   Query: {
@@ -13,19 +12,19 @@ const resolvers = {
   },
 
   Mutation: {
-    signup: async (_, { email, password }) => {
-      const existingUser = await User.findOne({ email });
-      if (existingUser) throw new Error('User already exists');
+    signup: async (_, { username, email, password }) => {
+      const existingUser = await User.findOne({ username });
+      if (existingUser) throw new Error('Username already exists');
 
       const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await User.create({ email, password: hashedPassword });
-      const token = jwt.sign({ userId: user.id }, SECRET, { expiresIn: '1d' });
+      const user = await User.create({ username, email, password: hashedPassword });
 
+      const token = jwt.sign({ userId: user.id }, SECRET, { expiresIn: '1d' });
       return { token, user };
     },
 
-    login: async (_, { email, password }) => {
-      const user = await User.findOne({ email });
+    login: async (_, { username, password }) => {
+      const user = await User.findOne({ username });
       if (!user) throw new Error('User not found');
 
       const valid = await bcrypt.compare(password, user.password);
@@ -35,13 +34,13 @@ const resolvers = {
       return { token, user };
     },
 
-    addEmployee: async (_, args) => {
-      const emp = new Employee(args);
+    addEmployee: async (_, { input }) => {
+      const emp = new Employee(input);
       return await emp.save();
     },
 
-    updateEmployee: async (_, { id, ...rest }) => {
-      return await Employee.findByIdAndUpdate(id, rest, { new: true });
+    updateEmployee: async (_, { id, input }) => {
+      return await Employee.findByIdAndUpdate(id, input, { new: true });
     },
 
     deleteEmployee: async (_, { id }) => {
