@@ -1,14 +1,27 @@
+// schema.js
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
+  type User {
+    id: ID!
+    email: String!
+    password: String
+    token: String
+  }
+
   type Employee {
     id: ID!
     name: String!
     email: String!
     department: String!
     position: String!
-    salary: Int!
+    salary: Float!
     imageUrl: String
+  }
+
+  type AuthPayload {
+    token: String!
+    user: User!
   }
 
   type Query {
@@ -17,12 +30,15 @@ const typeDefs = gql`
   }
 
   type Mutation {
+    signup(email: String!, password: String!): AuthPayload
+    login(email: String!, password: String!): AuthPayload
+
     addEmployee(
       name: String!
       email: String!
       department: String!
       position: String!
-      salary: Int!
+      salary: Float!
       imageUrl: String
     ): Employee
 
@@ -32,7 +48,7 @@ const typeDefs = gql`
       email: String
       department: String
       position: String
-      salary: Int
+      salary: Float
       imageUrl: String
     ): Employee
 
